@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Skycast Weather Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand-block">
+        <p class="kicker">Forecast-aware browsing</p>
+        <h1>Skycast</h1>
+        <p class="brand-copy">
+          Live conditions, searchable places, and a cleaner way to read the week ahead.
+        </p>
+      </div>
+
+      <div class="search-wrap">
+        <form id="search-form" class="search-form" autocomplete="off">
+          <label class="search-field" for="search-input">
+            <span class="sr-only">Search for a city</span>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M10.5 4a6.5 6.5 0 0 1 5.164 10.45l4.443 4.443-1.414 1.414-4.443-4.443A6.5 6.5 0 1 1 10.5 4Zm0 2a4.5 4.5 0 1 0 0 9 4.5 4.5 0 0 0 0-9Z"></path>
+            </svg>
+            <input
+              id="search-input"
+              name="location"
+              type="search"
+              placeholder="Search for a city or region"
+              aria-autocomplete="list"
+              aria-controls="suggestions"
+              aria-expanded="false"
+            >
+          </label>
+
+          <div class="search-actions">
+            <button type="submit" class="primary-button">Find weather</button>
+            <button type="button" class="ghost-button" id="geo-button">Use my location</button>
+          </div>
+
+          <ul id="suggestions" class="suggestions" role="listbox" hidden></ul>
+        </form>
+
+        <p class="source-note">Live data from Open-Meteo weather and geocoding APIs.</p>
+      </div>
+    </header>
+
+    <div id="state-banner" class="state-banner" role="status" aria-live="polite" hidden></div>
+
+    <main class="dashboard">
+      <section class="panel current-panel" aria-labelledby="location-label">
+        <div class="panel-heading">
+          <div>
+            <p class="section-kicker">Current conditions</p>
+            <h2 id="location-label">Loading location</h2>
+          </div>
+
+          <div class="status-pill">
+            <span class="status-dot" aria-hidden="true"></span>
+            <span id="status-text">Connecting to live data</span>
+          </div>
+        </div>
+
+        <div class="current-layout">
+          <div class="temperature-stack">
+            <p id="current-date" class="current-date">Fetching the latest local forecast.</p>
+            <div class="temp-line">
+              <span id="temperature-value">--</span>
+              <span class="temp-unit">&deg;C</span>
+            </div>
+            <p id="condition-text" class="condition-text">Checking the sky</p>
+            <p id="feels-like" class="feels-like">Feels like --</p>
+          </div>
+
+          <div class="spotlight">
+            <p class="spotlight-label">Right now</p>
+            <div id="condition-icon" class="spotlight-icon" aria-hidden="true">&#9729;</div>
+            <p id="spotlight-copy" class="spotlight-copy">
+              Waiting for the latest report.
+            </p>
+          </div>
+        </div>
+
+        <dl class="metrics-grid">
+          <div>
+            <dt>Humidity</dt>
+            <dd id="humidity-value">--</dd>
+          </div>
+          <div>
+            <dt>Wind</dt>
+            <dd id="wind-value">--</dd>
+          </div>
+          <div>
+            <dt>Rain</dt>
+            <dd id="rain-value">--</dd>
+          </div>
+          <div>
+            <dt>Pressure</dt>
+            <dd id="pressure-value">--</dd>
+          </div>
+          <div>
+            <dt>Sunrise</dt>
+            <dd id="sunrise-value">--</dd>
+          </div>
+          <div>
+            <dt>Sunset</dt>
+            <dd id="sunset-value">--</dd>
+          </div>
+        </dl>
+      </section>
+
+      <section class="panel hourly-panel" aria-labelledby="hourly-title">
+        <div class="panel-heading compact">
+          <div>
+            <p class="section-kicker">Hourly outlook</p>
+            <h3 id="hourly-title">The next hours</h3>
+          </div>
+          <p id="hourly-summary" class="panel-note">Select a day to explore its timeline.</p>
+        </div>
+
+        <div id="hourly-list" class="hourly-list" aria-live="polite"></div>
+      </section>
+
+      <section class="panel forecast-panel" aria-labelledby="selected-day-label">
+        <div class="panel-heading compact">
+          <div>
+            <p class="section-kicker">Seven-day forecast</p>
+            <h3>Browse the week ahead</h3>
+          </div>
+          <p id="daily-range" class="panel-note">--</p>
+        </div>
+
+        <div class="forecast-layout">
+          <div id="daily-list" class="daily-list" role="list"></div>
+
+          <aside class="detail-panel">
+            <p class="section-kicker">Selected forecast</p>
+            <h4 id="selected-day-label">Today</h4>
+            <p id="selected-day-summary" class="detail-copy">
+              Choose a day to inspect the temperature swing and daylight window.
+            </p>
+
+            <div class="detail-temps">
+              <div>
+                <span class="temp-label">High</span>
+                <strong id="selected-max">--</strong>
+              </div>
+              <div>
+                <span class="temp-label">Low</span>
+                <strong id="selected-min">--</strong>
+              </div>
+            </div>
+
+            <dl class="detail-grid">
+              <div>
+                <dt>Rain chance</dt>
+                <dd id="selected-rain">--</dd>
+              </div>
+              <div>
+                <dt>UV peak</dt>
+                <dd id="selected-uv">--</dd>
+              </div>
+              <div>
+                <dt>Sunrise</dt>
+                <dd id="selected-sunrise">--</dd>
+              </div>
+              <div>
+                <dt>Sunset</dt>
+                <dd id="selected-sunset">--</dd>
+              </div>
+            </dl>
+          </aside>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="script.js" defer></script>
+</body>
+</html>
